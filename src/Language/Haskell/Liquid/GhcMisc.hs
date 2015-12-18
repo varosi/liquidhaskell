@@ -110,14 +110,14 @@ miModGuts cls mg  = MI {
 --------------- Generic Helpers for Encoding Location -----------------
 -----------------------------------------------------------------------
 
-srcSpanTick :: Module -> SrcSpan -> Tickish a
-srcSpanTick m loc
-  = ProfNote (AllCafsCC m loc) False True
+-- srcSpanTick :: Module -> SrcSpan -> Tickish a
+-- srcSpanTick m loc
+--   = ProfNote (AllCafsCC m loc) False True
 
 tickSrcSpan ::  Outputable a => Tickish a -> SrcSpan
-tickSrcSpan (ProfNote cc _ _) = cc_loc cc
-tickSrcSpan (SourceNote ss _) = RealSrcSpan ss
-tickSrcSpan _                 = noSrcSpan
+-- tickSrcSpan (ProfNote cc _ _) = cc_loc cc
+tickSrcSpan (SourceNote ss _) = tracePpr "tick" $ RealSrcSpan ss
+tickSrcSpan _                 = tracePpr "notick" $ noSrcSpan
 
 -----------------------------------------------------------------------
 --------------- Generic Helpers for Accessing GHC Innards -------------

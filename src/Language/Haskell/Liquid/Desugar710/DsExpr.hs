@@ -64,9 +64,9 @@ import Data.IORef       ( atomicModifyIORef, modifyIORef )
 import Control.Monad
 import GHC.Fingerprint
 
-srcSpanTick :: Module -> SrcSpan -> Tickish a
-srcSpanTick m loc
-  = ProfNote (AllCafsCC m loc) False True
+-- srcSpanTick :: Module -> SrcSpan -> Tickish a
+-- srcSpanTick m loc
+--   = ProfNote (AllCafsCC m loc) False True
 
 {-
 ************************************************************************
@@ -192,8 +192,7 @@ dsLExpr :: LHsExpr Id -> DsM CoreExpr
 
 dsLExpr (L loc e) 
   = do ce <- putSrcSpanDs loc $ dsExpr e
-       m  <- getModule
-       return $ Tick (srcSpanTick m loc) ce
+       return ce
 
 dsExpr :: HsExpr Id -> DsM CoreExpr
 dsExpr (HsPar e)              = dsLExpr e

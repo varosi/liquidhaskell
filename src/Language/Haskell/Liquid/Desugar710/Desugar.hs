@@ -45,7 +45,7 @@ import FastString
 import ErrUtils
 import Outputable
 import SrcLoc
-import Coverage
+import Language.Haskell.Liquid.Desugar710.Coverage
 import Util
 import MonadUtils
 import OrdList
@@ -150,12 +150,12 @@ deSugar hsc_env
         -- You might think it doesn't matter, but the simplifier brings all top-level
         -- things into the in-scope set before simplifying; so we get no unfolding for F#!
 
-        ; (ds_binds, ds_rules_for_imps, ds_vects)
-            <- simpleOptPgm dflags mod final_pgm rules_for_imps vects0
-                         -- The simpleOptPgm gets rid of type
-                         -- bindings plus any stupid dead code
+        -- ; (ds_binds, ds_rules_for_imps, ds_vects)
+        --     <- simpleOptPgm dflags mod final_pgm rules_for_imps vects0
+        --                  -- The simpleOptPgm gets rid of type
+        --                  -- bindings plus any stupid dead code
 
-        ; endPassIO hsc_env print_unqual CoreDesugarOpt ds_binds ds_rules_for_imps
+        ; endPassIO hsc_env print_unqual CoreDesugarOpt final_pgm rules_for_imps
 
         ; let used_names = mkUsedNames tcg_env
         ; deps <- mkDependencies tcg_env
@@ -182,12 +182,12 @@ deSugar hsc_env
                 mg_inst_env     = inst_env,
                 mg_fam_inst_env = fam_inst_env,
                 mg_patsyns      = patsyns,
-                mg_rules        = ds_rules_for_imps,
-                mg_binds        = ds_binds,
+                mg_rules        = rules_for_imps, -- ds_rules_for_imps,
+                mg_binds        = final_pgm, -- ds_binds,
                 mg_foreign      = ds_fords,
                 mg_hpc_info     = ds_hpc_info,
                 mg_modBreaks    = modBreaks,
-                mg_vect_decls   = ds_vects,
+                mg_vect_decls   = vects0, -- ds_vects,
                 mg_vect_info    = noVectInfo,
                 mg_safe_haskell = safe_mode,
                 mg_trust_pkg    = imp_trust_own_pkg imports,

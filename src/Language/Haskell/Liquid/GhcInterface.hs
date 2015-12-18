@@ -20,6 +20,9 @@ import DriverPipeline (compileFile)
 import Text.PrettyPrint.HughesPJ
 import HscTypes hiding (Target)
 import CoreSyn
+import qualified Outputable as Out
+import OccurAnal
+import VarEnv
 
 import Class
 import Var
@@ -193,8 +196,13 @@ getGhcModGuts1 fn = do
        -- mod_guts <- modSummaryModGuts modSummary
        mod_p    <- parseModule modSummary
        mod_guts <- coreModule <$> (desugarModule =<< typecheckModule (ignoreInline mod_p))
-       let deriv = getDerivedDictionaries mod_guts
-       return   $! (miModGuts (Just deriv) mod_guts)
+       let occ_anald_binds = occurAnalysePgm (mg_module mod_guts)
+                                             (const False)
+                                             [] [] emptyVarEnv
+                                             (mg_binds mod_guts)
+       let mod_guts' = mod_guts { mg_binds = occ_anald_binds }
+       let deriv = getDerivedDictionaries mod_guts'
+       return   $! (miModGuts (Just deriv) mod_guts')
      Nothing     -> exitWithPanic "Ghc Interface: Unable to get GhcModGuts"
 
 getDerivedDictionaries cm = instEnvElts $ mg_inst_env cm
